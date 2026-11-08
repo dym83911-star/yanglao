@@ -1,4 +1,4 @@
-﻿﻿<template>
+﻿﻿﻿﻿<template>
   <div class="home-view">
     <header class="main-header">
       <nav class="navbar navbar-expand-lg">
@@ -42,42 +42,38 @@
                 </router-link>
               </li>
             </ul>
-            <div class="accessibility-controls ms-3">
-              <el-button size="small" @click="toggleDarkMode" :icon="isDarkMode ? 'Sunny' : 'Moon'" circle />
-            </div>
           </div>
         </div>
       </nav>
     </header>
 
     <div id="home" class="page-section active">
-      <div class="hero-carousel">
-        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-indicators">
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-          </div>
-          <div class="carousel-inner">
-            <div class="carousel-item active">
-              <div class="carousel-bg bg-1"><img :src="hero" class="hero-img" alt="首页图"/></div>
-              <div class="carousel-caption">
-                <h2>温馨养老 智慧生活</h2>
-                <p>为老年人提供全方位的数字化养老服务</p>
+      <div class="hero-editorial">
+        <div class="container">
+          <div class="hero-inner">
+            <div class="hero-copy">
+              <span class="hero-eyebrow">SAGE CARE · 智慧养老</span>
+              <h1>让晚年生活<br /><em>从容而温暖</em></h1>
+              <p>健康记录、防骗守护、银发课堂与社区资讯，一处安放。为长者和家人提供安静、可靠的数字陪伴。</p>
+              <div class="hero-actions">
+                <router-link to="/health" class="hero-btn primary">开始健康打卡</router-link>
+                <router-link to="/classroom" class="hero-btn ghost">浏览银发课堂</router-link>
               </div>
             </div>
-            <div class="carousel-item">
-              <div class="carousel-bg bg-2"><img :src="first2" class="hero-img" alt="健康守护"/></div>
-              <div class="carousel-caption">
-                <h2>健康守护 安心晚年</h2>
-                <p>科学管理健康数据，专业医疗指导</p>
-              </div>
-            </div>
-            <div class="carousel-item">
-              <div class="carousel-bg bg-3"><img :src="first3" class="hero-img" alt="数字反诈"/></div>
-              <div class="carousel-caption">
-                <h2>数字反诈 安全上网</h2>
-                <p>提升防骗意识，保障财产安全</p>
+            <div class="hero-side">
+              <div class="hero-metrics">
+                <div class="metric">
+                  <span class="metric-num">1,286</span>
+                  <span class="metric-label">在册长者</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-num">12</span>
+                  <span class="metric-label">今日社区活动</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-num">5</span>
+                  <span class="metric-label">在线课程</span>
+                </div>
               </div>
             </div>
           </div>
@@ -94,11 +90,15 @@
 
       <div class="container mt-5">
         <div class="stats-dashboard">
-          <h3 class="section-title text-center mb-4">
-            <i class="bi bi-bar-chart-line"></i> 社区养老数据概览
-          </h3>
-          <div class="row">
-            <div class="col-md-3 col-6 mb-3">
+          <header class="section-head">
+            <div>
+              <span class="section-eyebrow">COMMUNITY DATA</span>
+              <h3 class="section-title">社区养老数据概览</h3>
+            </div>
+            <span class="section-note">数据每日更新</span>
+          </header>
+          <div class="row g-4">
+            <div class="col-md-3 col-6">
               <div class="stat-card">
                 <div class="stat-icon bg-primary">
                   <svg class="stat-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -111,7 +111,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-3 col-6 mb-3">
+            <div class="col-md-3 col-6">
               <div class="stat-card">
                 <div class="stat-icon bg-success">
                   <svg class="stat-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -124,7 +124,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-3 col-6 mb-3">
+            <div class="col-md-3 col-6">
               <div class="stat-card">
                 <div class="stat-icon bg-info">
                   <svg class="stat-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -137,7 +137,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-3 col-6 mb-3">
+            <div class="col-md-3 col-6">
               <div class="stat-card">
                 <div class="stat-icon bg-warning">
                   <svg class="stat-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -154,9 +154,13 @@
         </div>
 
         <div class="quick-services mt-5">
-          <h3 class="section-title text-center mb-4">
-            <i class="bi bi-grid"></i> 便捷服务
-          </h3>
+          <header class="section-head">
+            <div>
+              <span class="section-eyebrow">SERVICES</span>
+              <h3 class="section-title">便捷服务</h3>
+            </div>
+            <span class="section-note">4 项常用入口</span>
+          </header>
           <div class="row g-4">
             <div class="col-lg-3 col-md-6">
               <div class="service-card" @click="goTo('/health')">
@@ -165,8 +169,10 @@
                     <path fill="white" d="M12 21s-7-4.35-9-7.5C1.5 10.5 4 7 7 7c1.7 0 3.1.9 4 2 0.9-1.1 2.3-2 4-2 3 0 5.5 3.5 4 6.5-2 3.15-9 7.5-9 7.5z"/>
                   </svg>
                 </div>
-                <h4>健康打卡</h4>
-                <p>记录血压、血糖、睡眠等健康数据</p>
+                <div class="service-body">
+                  <h4>健康打卡</h4>
+                  <p>记录血压、血糖、睡眠等健康数据</p>
+                </div>
               </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -176,8 +182,10 @@
                     <path fill="white" d="M5 3v18a1 1 0 0 0 2 0V13h10a1 1 0 0 0 .6-1.8L15 8l2.6-3.2A1 1 0 0 0 16 3H7a2 2 0 0 0-2 0z"/>
                   </svg>
                 </div>
-                <h4>我要举报</h4>
-                <p>遇到诈骗行为及时举报</p>
+                <div class="service-body">
+                  <h4>我要举报</h4>
+                  <p>遇到诈骗行为及时举报</p>
+                </div>
               </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -187,8 +195,10 @@
                     <path fill="white" d="M8 5v14l11-7z"/>
                   </svg>
                 </div>
-                <h4>在线学习</h4>
-                <p>丰富的银发课堂视频课程</p>
+                <div class="service-body">
+                  <h4>在线学习</h4>
+                  <p>丰富的银发课堂视频课程</p>
+                </div>
               </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -199,18 +209,21 @@
                     <path fill="white" d="M6 3.5h12a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1zm0 2a4 4 0 0 0-1 0v1h14v-1a4 4 0 0 0-1 0H6z"/>
                   </svg>
                 </div>
-                <h4>活动预约</h4>
-                <p>预约社区养老服务活动</p>
+                <div class="service-body">
+                  <h4>活动预约</h4>
+                  <p>预约社区养老服务活动</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="news-section mt-5">
-          <div class="news-header-section">
-            <h3 class="section-title">
-              <i class="bi bi-newspaper"></i> 最新资讯
-            </h3>
+          <header class="section-head">
+            <div>
+              <span class="section-eyebrow">NEWS</span>
+              <h3 class="section-title">最新资讯</h3>
+            </div>
             <div class="news-controls">
               <el-input
                 v-model="searchKeyword"
@@ -224,7 +237,7 @@
                 </template>
               </el-input>
             </div>
-          </div>
+          </header>
 
           <el-tabs v-model="activeCategory" @tab-change="handleCategoryChange" class="news-tabs">
             <el-tab-pane
@@ -248,7 +261,10 @@
                 <div class="news-main-area">
                   <div v-if="displayNews.length > 0" class="featured-news">
                     <div class="news-card featured" @click="goToNews(displayNews[0].id)">
-                      <img :src="displayNews[0] && displayNews[0].image ? displayNews[0].image : heroImage" class="news-image featured-img" alt=""/>
+                      <div class="news-cover featured-cover photo-cover">
+                        <img :src="featuredNewsCover" alt="社区长者在公园散步" />
+                        <span>{{ displayNews[0].categoryName }}</span>
+                      </div>
                       <div class="news-content">
                         <div class="news-tags">
                           <el-tag size="small" :type="getCategoryType(displayNews[0].category)">
@@ -276,7 +292,13 @@
                       class="news-card horizontal"
                       @click="goToNews(news.id)"
                     >
-                      <img class="news-list-img" :src="news.image || listImages[idx % listImages.length]" alt=""/>
+                      <div
+                        class="news-cover list-cover"
+                        :class="coverOf(news) ? 'photo-cover' : 'cat-' + news.category"
+                      >
+                        <img v-if="coverOf(news)" :src="coverOf(news)" :alt="news.title" />
+                        <span v-else>{{ news.categoryName }}</span>
+                      </div>
                       <div class="news-content">
                         <div class="news-tags">
                           <el-tag size="small" :type="getCategoryType(news.category)">
@@ -427,8 +449,24 @@ import newsImg1 from '@/assets/news-1.png'
 import newsImg2 from '@/assets/news-2.png'
 import newsImg3 from '@/assets/news-3.png'
 import newsImg4 from '@/assets/news-4.png'
+import featuredNewsCover from '@/assets/news-featured.jpg'
+import newsPolicyCover from '@/assets/news-policy.jpg'
+import newsAntiFraudCover from '@/assets/news-anti-fraud.jpg'
+import newsActivityCover from '@/assets/news-activity.jpg'
+import newsLifeCover from '@/assets/news-life.jpg'
+import newsHealthCover from '@/assets/news-health.jpg'
 
 const listImages = [newsImg1, newsImg2, newsImg3, newsImg4]
+
+// 部分分类使用实拍封面，其余沿用分类色块
+const categoryCovers = {
+  policy: newsPolicyCover,
+  'anti-fraud': newsAntiFraudCover,
+  activity: newsActivityCover,
+  life: newsLifeCover,
+  health: newsHealthCover
+}
+const coverOf = (news) => categoryCovers[news.category] || null
 
 const router = useRouter()
 
@@ -436,7 +474,6 @@ const router = useRouter()
 const isManager = checkManager()
 const isAdminRole = checkAdmin()
 const goConsole = () => router.push('/console')
-const isDarkMode = ref(localStorage.getItem('darkMode') === 'true')
 const toastVisible = ref(false)
 const toastMessage = ref('')
 const activeCategory = ref('all')
@@ -537,13 +574,6 @@ const animateAllStats = () => {
   })
 }
 
-const toggleDarkMode = () => {
-  isDarkMode.value = !isDarkMode.value
-  document.body.classList.toggle('dark-mode', isDarkMode.value)
-  localStorage.setItem('darkMode', isDarkMode.value.toString())
-  ElMessage.success(isDarkMode.value ? '已开启深色模式' : '已关闭深色模式')
-}
-
 const goTo = (path) => {
   router.push(path)
 }
@@ -605,10 +635,6 @@ const showToast = (message) => {
   toastVisible.value = true
 }
 
-watch(isDarkMode, (newVal) => {
-  document.body.classList.toggle('dark-mode', newVal)
-})
-
 watch(searchKeyword, (newVal) => {
   if (!newVal) {
     displayCount.value = 6
@@ -616,9 +642,6 @@ watch(searchKeyword, (newVal) => {
 })
 
 onMounted(() => {
-  if (isDarkMode.value) {
-    document.body.classList.add('dark-mode')
-  }
   animateAllStats()
   loadRemoteNews()
 
@@ -675,13 +698,14 @@ onMounted(() => {
 .manager-tip {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.9rem 1.2rem;
-  background: #eef4ff;
-  border: 1px solid #c6ddff;
-  border-radius: 8px;
-  color: #2d5b9e;
-  font-size: 0.95rem;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-accent-soft);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  color: var(--c-text-2);
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
 }
 
 .manager-tip i {
@@ -763,14 +787,15 @@ onMounted(() => {
 }
 
 .hot-tag {
-  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-  color: white;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--sp-1);
 }
 
 .news-card h4,
@@ -854,24 +879,24 @@ onMounted(() => {
 }
 
 .topic-rank.rank-1 {
-  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-  color: white;
+  background: var(--c-gold);
+  color: #fbfaf6;
 }
 
 .topic-rank.rank-2 {
-  background: linear-gradient(135deg, #ffa502, #ffbe4d);
-  color: white;
+  background: color-mix(in srgb, var(--c-gold) 60%, var(--c-surface));
+  color: #fbfaf6;
 }
 
 .topic-rank.rank-3 {
-  background: linear-gradient(135deg, #7bed9f, #a8f0c6);
-  color: white;
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
 }
 
 .topic-rank.rank-4,
 .topic-rank.rank-5 {
-  background: var(--border-color);
-  color: var(--text-light);
+  background: var(--c-surface-2);
+  color: var(--c-text-3);
 }
 
 .topic-content h6 {
@@ -985,30 +1010,54 @@ onMounted(() => {
 
 .service-card {
   background: var(--white);
-  border-radius: 12px;
-  padding: 2.2rem 1.2rem;
-  text-align: center;
-  box-shadow: 0 6px 16px rgba(13,38,59,0.04);
+  border-radius: var(--r-md);
+  padding: var(--sp-5);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  text-align: left;
+  box-shadow: var(--sh-1);
   cursor: pointer;
-  transition: transform .14s ease, box-shadow .14s ease;
+  height: 100%;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
-.service-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(13,38,59,0.08); }
+.service-card:hover { transform: translateY(-2px); box-shadow: var(--sh-2); }
 .service-icon {
-  width: 110px;
-  height: 110px;
-  margin: 0 auto 18px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  margin: 0;
+  border-radius: var(--r-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 22px rgba(15,40,60,0.06);
+  background: var(--c-accent-soft);
+  border: 1px solid var(--c-border);
 }
-.service-icon i { color: #fff; font-size: 40px; }
-.service-icon .service-svg { width: 56px; height: 56px; display: block; }
-.service-icon.health { background: linear-gradient(135deg,#6ea8ff,#4d7cff); }
-.service-icon.report { background: linear-gradient(135deg,#f6a5a5,#e86b6b); }
-.service-icon.learn { background: linear-gradient(135deg,#86d68f,#3fb36a); }
-.service-icon.reserve { background: linear-gradient(135deg,#f7b76b,#f89b5b); }
+.service-icon i { color: var(--c-accent); font-size: 18px; }
+.service-icon .service-svg { width: 18px; height: 18px; display: block; }
+.service-icon.health,
+.service-icon.report,
+.service-icon.learn,
+.service-icon.reserve { background: var(--c-accent-soft); }
+
+.service-body h4 {
+  font-size: var(--fs-16);
+  line-height: var(--lh-16);
+  font-weight: 500;
+  color: var(--c-text);
+  margin: 0 0 var(--sp-1);
+}
+.service-body p {
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: var(--c-text-2);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .stat-icon .stat-svg { width: 28px; height: 28px; display: block; }
 

@@ -60,12 +60,15 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.GET, "/api/courses").permitAll()
                         .antMatchers(
                                 "/api/auth/login",
+                                "/api/auth/login-sms",
+                                "/api/auth/sms-code",
                                 "/api/auth/register",
                                 "/api/auth/reset-password",
                                 "/api/public/**",
                                 "/api/health/tips",
                                 "/api/news/**",
                                 "/api/fraud/cases",
+                                "/uploads/**",
                                 "/druid/**"
                         ).permitAll()
                         .anyRequest().authenticated()

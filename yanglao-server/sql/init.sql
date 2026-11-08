@@ -247,6 +247,7 @@ CREATE TABLE news_category (
   code        VARCHAR(30)  NOT NULL,
   sort        INT          DEFAULT 0,
   create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  update_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uk_code (code)
 ) ENGINE=InnoDB COMMENT='资讯分类';

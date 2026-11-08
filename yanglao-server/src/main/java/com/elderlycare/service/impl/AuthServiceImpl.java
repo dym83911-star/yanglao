@@ -6,6 +6,7 @@ import com.elderlycare.common.Result;
 import com.elderlycare.dto.AuthLoginDTO;
 import com.elderlycare.dto.AuthRegisterDTO;
 import com.elderlycare.dto.AuthResetPasswordDTO;
+import com.elderlycare.dto.AuthSmsLoginDTO;
 import com.elderlycare.entity.*;
 import com.elderlycare.mapper.*;
 import com.elderlycare.security.JwtProperties;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +75,11 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(403, "账号已禁用");
         }
 
+        return Result.success(doLogin(user));
+    }
+
+    /** 校验通过后的统一登录处理：签发 JWT、写 Redis 会话、记录日志 */
+    private LoginVO doLogin(SysUser user) {
         List<String> roleCodes = loadRoleCodes(user.getId());
         String token = jwtUtil.generate(user.getId(), user.getPhone(), roleCodes);
 
@@ -85,12 +92,62 @@ public class AuthServiceImpl implements AuthService {
         sysUserMapper.updateById(user);
 
         saveLoginLog(user.getId(), user.getPhone(), true, "登录成功");
-        log.info("User login success: phone={}", dto.getPhone());
+        log.info("User login success: phone={}", user.getPhone());
 
         LoginVO vo = new LoginVO();
         vo.setToken(token);
         vo.setUser(buildUserVO(user, roleCodes));
-        return Result.success(vo);
+        return vo;
+    }
+
+    @Override
+    public Result<String> sendSmsCode(String phone) {
+        if (phone == null || !phone.trim().matches("^1[3-9]\\d{9}$")) {
+            throw new BusinessException(400, "请输入正确的手机号");
+        }
+        String p = phone.trim();
+        SysUser user = sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("phone", p));
+        if (user == null) {
+            throw new BusinessException(404, "该手机号未注册");
+        }
+        if (Boolean.TRUE.equals(redisTemplate.hasKey("sms:limit:" + p))) {
+            throw new BusinessException(429, "验证码已发送，请 60 秒后再试");
+        }
+
+        String code = String.format("%06d", new SecureRandom().nextInt(1000000));
+        redisTemplate.opsForValue().set("sms:login:" + p, code, 5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set("sms:limit:" + p, "1", 60, TimeUnit.SECONDS);
+        log.info("SMS login code generated: phone={}, code={}", p, code);
+
+        // 演示环境没有接入短信网关，直接把验证码返回给前端展示
+        return Result.success(code);
+    }
+
+    @Override
+    public Result<LoginVO> loginBySms(AuthSmsLoginDTO dto) {
+        if (dto.getPhone() == null || dto.getCode() == null
+                || dto.getPhone().trim().isEmpty() || dto.getCode().trim().isEmpty()) {
+            throw new BusinessException(400, "请输入手机号和验证码");
+        }
+        String p = dto.getPhone().trim();
+        Object cached = redisTemplate.opsForValue().get("sms:login:" + p);
+        if (cached == null) {
+            throw new BusinessException(400, "验证码已失效，请重新获取");
+        }
+        if (!cached.toString().equals(dto.getCode().trim())) {
+            throw new BusinessException(400, "验证码不正确");
+        }
+        redisTemplate.delete("sms:login:" + p);
+
+        SysUser user = sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("phone", p));
+        if (user == null) {
+            throw new BusinessException(404, "该手机号未注册");
+        }
+        if (user.getStatus() != null && user.getStatus() != 1) {
+            saveLoginLog(user.getId(), p, false, "账号已禁用");
+            throw new BusinessException(403, "账号已禁用");
+        }
+        return Result.success(doLogin(user));
     }
 
     @Override

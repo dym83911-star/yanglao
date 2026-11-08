@@ -2,9 +2,11 @@ package com.elderlycare.controller;
 
 import com.elderlycare.common.PageResult;
 import com.elderlycare.common.Result;
+import com.elderlycare.dto.NewsCreateDTO;
 import com.elderlycare.dto.NewsQueryDTO;
 import com.elderlycare.entity.News;
 import com.elderlycare.service.NewsService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +47,12 @@ public class NewsController {
     @GetMapping("/hot")
     public Result<List<News>> hot(@RequestParam(defaultValue = "5") Integer limit) {
         return newsService.hot(limit);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    public Result<Void> create(@RequestBody NewsCreateDTO dto) {
+        return newsService.create(dto, getUserId());
     }
 
     @PostMapping("/favorite")

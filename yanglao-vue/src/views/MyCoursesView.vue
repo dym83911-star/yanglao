@@ -112,11 +112,11 @@ const typeFilter = ref('all')
 
 // 课程卡片样式（按顺序循环套用）
 const courseStyles = [
-  { icon: 'bi bi-phone', bgColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-  { icon: 'bi bi-credit-card-2-front', bgColor: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-  { icon: 'bi bi-person-arms-up', bgColor: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
-  { icon: 'bi bi-heart-pulse', bgColor: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
-  { icon: 'bi bi-people', bgColor: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }
+  { icon: 'bi bi-phone', bgColor: 'linear-gradient(135deg, #5c6b55 0%, #8a957e 100%)' },
+  { icon: 'bi bi-credit-card-2-front', bgColor: 'linear-gradient(135deg, #8d7a5c 0%, #b7a482 100%)' },
+  { icon: 'bi bi-person-arms-up', bgColor: 'linear-gradient(135deg, #4f6354 0%, #7d9180 100%)' },
+  { icon: 'bi bi-heart-pulse', bgColor: 'linear-gradient(135deg, #6d7a63 0%, #9aa78d 100%)' },
+  { icon: 'bi bi-people', bgColor: 'linear-gradient(135deg, #7a6a56 0%, #a89a82 100%)' }
 ]
 
 // 课程配套教学视频（courseId → 视频地址）
@@ -188,25 +188,25 @@ onMounted(() => {
 <style scoped>
 .my-courses-view {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--c-bg);
 }
 
 .loading-box {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
+  background: var(--c-surface);
+  padding: var(--sp-5);
+  border-radius: var(--r-sm);
 }
 
 .course-filter {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 16px;
+  margin-bottom: var(--sp-4);
 }
 
 .course-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  gap: var(--sp-5);
 }
 
 .course-cover {
@@ -226,62 +226,69 @@ onMounted(() => {
 
 .course-tag {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 0.25rem 0.75rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
-  font-size: 0.8rem;
-  color: #333;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  padding: 2px var(--sp-3);
+  background: color-mix(in srgb, var(--c-surface) 88%, transparent);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: var(--c-text);
 }
 
 /* 线上/线下课程类型标识 */
 .course-type {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 0.2rem 0.6rem;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  color: #fff;
+  top: var(--sp-3);
+  left: var(--sp-3);
+  padding: 2px var(--sp-3);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: #fbfaf6;
 }
 
 .type-online {
-  background: rgba(64, 158, 255, 0.9);
+  background: color-mix(in srgb, var(--c-accent) 92%, transparent);
 }
 
 .type-offline {
-  background: rgba(103, 194, 58, 0.9);
+  background: color-mix(in srgb, var(--c-gold) 92%, transparent);
 }
 
 /* 线下课的上课时间与地点 */
 .course-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem 1rem;
-  margin-bottom: 10px;
-  font-size: 0.85rem;
-  color: #666;
+  gap: var(--sp-2) var(--sp-4);
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: var(--c-text-2);
 }
 
 .course-meta span {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--sp-1);
 }
 
 .course-info {
-  padding: 15px;
+  padding: var(--sp-4);
 }
 
 .course-info h5 {
-  margin-bottom: 10px;
+  margin-bottom: var(--sp-3);
 }
 
 .course-info p {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 10px;
+  color: var(--c-text-2);
+  font-size: var(--fs-14);
+  margin-bottom: var(--sp-3);
   min-height: 40px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

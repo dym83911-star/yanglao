@@ -84,6 +84,54 @@
               <el-empty v-if="pendingNews.length === 0 && !loading" description="暂无待审核资讯" />
             </el-tab-pane>
 
+            <!-- ============ 健康管理员 / 系统管理员：发布资讯 ============ -->
+            <el-tab-pane label="发布资讯" name="publishNews" v-if="isDoctor || isAdmin">
+              <el-form :model="newsForm" :rules="newsRules" ref="newsFormRef" label-width="100px" size="large" style="max-width: 720px;">
+                <el-form-item label="资讯标题" prop="title">
+                  <el-input v-model="newsForm.title" placeholder="如：秋季老年人饮食注意事项" maxlength="50" show-word-limit />
+                </el-form-item>
+                <el-form-item label="资讯分类" prop="category">
+                  <el-select v-model="newsForm.category" placeholder="请选择分类" style="width: 100%;">
+                    <el-option v-for="c in newsCategoryOptions" :key="c.code" :label="c.name" :value="c.name" />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="资讯摘要">
+                  <el-input v-model="newsForm.excerpt" placeholder="可选，不填将自动截取正文前 60 字" maxlength="100" show-word-limit />
+                </el-form-item>
+                <el-form-item label="资讯正文" prop="content">
+                  <el-input v-model="newsForm.content" type="textarea" :rows="8" placeholder="请输入资讯正文" maxlength="2000" show-word-limit />
+                </el-form-item>
+                <el-form-item label="资讯封面">
+                  <div class="cover-field">
+                    <div class="cover-preview">
+                      <img v-if="newsForm.coverUrl" :src="newsForm.coverUrl" alt="资讯封面预览" />
+                      <span v-else>暂无封面</span>
+                    </div>
+                    <div class="cover-actions">
+                      <div class="cover-buttons">
+                        <el-upload :auto-upload="false" :show-file-list="false" accept="image/*" :on-change="onNewsCoverChange">
+                          <el-button :loading="newsCoverUploading">
+                            <i class="bi bi-image"></i> 选择图片
+                          </el-button>
+                        </el-upload>
+                        <el-button v-if="newsForm.coverUrl" link type="danger" @click="newsForm.coverUrl = ''">移除</el-button>
+                      </div>
+                      <p class="cover-tip">建议横版图片，比例约 2:1，不超过 5MB</p>
+                    </div>
+                  </div>
+                </el-form-item>
+                <el-form-item label="来源">
+                  <el-input v-model="newsForm.source" placeholder="如：人民网·健康频道，不填默认「智慧养老平台」" maxlength="50" />
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" :loading="newsPublishing" @click="submitNews">
+                    <i class="bi bi-send"></i> 提交审核
+                  </el-button>
+                  <span style="color: var(--c-text-3); font-size: 13px; margin-left: 12px;">提交后经系统管理员审核才会在前台显示</span>
+                </el-form-item>
+              </el-form>
+            </el-tab-pane>
+
             <!-- ============ 健康管理员：发布课程 / 预约名单 ============ -->
             <el-tab-pane label="发布课程" name="publish" v-if="isDoctor || isAdmin">
               <el-form :model="courseForm" :rules="courseRules" ref="courseFormRef" label-width="100px" size="large" style="max-width: 640px;">
@@ -115,6 +163,25 @@
                     <el-input-number v-model="courseForm.maxStudents" :min="1" :max="500" />
                   </el-form-item>
                 </template>
+                <el-form-item label="课程封面">
+                  <div class="cover-field">
+                    <div class="cover-preview" :class="{ 'is-empty': !courseForm.coverUrl }">
+                      <img v-if="courseForm.coverUrl" :src="courseForm.coverUrl" alt="课程封面预览" />
+                      <span v-else>暂无封面</span>
+                    </div>
+                    <div class="cover-actions">
+                      <div class="cover-buttons">
+                        <el-upload :auto-upload="false" :show-file-list="false" accept="image/*" :on-change="onCoverChange">
+                          <el-button :loading="coverUploading">
+                            <i class="bi bi-image"></i> 选择图片
+                          </el-button>
+                        </el-upload>
+                        <el-button v-if="courseForm.coverUrl" link type="danger" @click="courseForm.coverUrl = ''">移除</el-button>
+                      </div>
+                      <p class="cover-tip">建议横版图片，比例约 2:1，不超过 5MB</p>
+                    </div>
+                  </div>
+                </el-form-item>
                 <el-form-item label="课程简介" prop="description">
                   <el-input v-model="courseForm.description" type="textarea" :rows="3" placeholder="课程内容简介" maxlength="500" show-word-limit />
                 </el-form-item>
@@ -122,7 +189,7 @@
                   <el-button type="primary" :loading="publishing" @click="submitCourse">
                     <i class="bi bi-cloud-arrow-up"></i> 提交审核
                   </el-button>
-                  <span style="color:#909399; font-size:13px; margin-left:12px;">发布后经系统管理员审核才会对学员可见</span>
+                  <span style="color: var(--c-text-3); font-size: 13px; margin-left: 12px;">发布后经系统管理员审核才会对学员可见</span>
                 </el-form-item>
               </el-form>
             </el-tab-pane>
@@ -184,13 +251,21 @@ import { getCurrentUser } from '../api/auth'
 import { getPendingCourses, reviewCourse, getPendingNews, reviewNews } from '../api/admin'
 import { createCourse, getManagedCourses } from '../api/course'
 import { getManagedBookings, confirmBooking } from '../api/booking'
+import { getNewsCategories, createNews } from '../api/news'
+import { uploadImage } from '../api/upload'
 import { getToken } from '../utils/session'
 
 const currentUser = ref(null)
 const activeTab = ref('courseReview')
 const loading = ref(false)
 const publishing = ref(false)
+const coverUploading = ref(false)
 const courseFormRef = ref(null)
+
+const newsFormRef = ref(null)
+const newsPublishing = ref(false)
+const newsCoverUploading = ref(false)
+const newsCategoryOptions = ref([])
 
 const pendingCourses = ref([])
 const pendingNews = ref([])
@@ -204,6 +279,7 @@ const courseForm = reactive({
   name: '',
   type: 'OFFLINE',
   tag: '新上',
+  coverUrl: '',
   startTime: '',
   location: '',
   maxStudents: 30,
@@ -213,6 +289,21 @@ const courseForm = reactive({
 const courseRules = {
   name: [{ required: true, message: '请填写课程名称', trigger: 'blur' }],
   type: [{ required: true, message: '请选择课程类型', trigger: 'change' }]
+}
+
+const newsForm = reactive({
+  title: '',
+  category: '',
+  excerpt: '',
+  content: '',
+  source: '',
+  coverUrl: ''
+})
+
+const newsRules = {
+  title: [{ required: true, message: '请填写资讯标题', trigger: 'blur' }],
+  category: [{ required: true, message: '请选择资讯分类', trigger: 'change' }],
+  content: [{ required: true, message: '请填写资讯正文', trigger: 'blur' }]
 }
 
 const courseStatusText = (s) => ({ approved: '已通过', pending: '待审核', rejected: '已驳回' }[s] || s)
@@ -256,6 +347,61 @@ const doReviewNews = async (id, approved) => {
   }
 }
 
+// 选择封面后立即上传，成功后写入表单
+const applyCover = async (uploadFile, form, uploadingRef) => {
+  const file = uploadFile?.raw
+  if (!file) return
+  if (!file.type.startsWith('image/')) {
+    ElMessage.warning('请选择图片文件')
+    return
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    ElMessage.warning('图片不能超过 5MB')
+    return
+  }
+
+  uploadingRef.value = true
+  try {
+    const res = await uploadImage(file)
+    if (res.code === 200 && res.data && res.data.url) {
+      form.coverUrl = res.data.url
+      ElMessage.success('封面已上传')
+    } else {
+      ElMessage.error(res.message || '上传失败')
+    }
+  } catch (e) {
+    ElMessage.error('上传失败，请稍后重试')
+  } finally {
+    uploadingRef.value = false
+  }
+}
+
+const onCoverChange = (uploadFile) => applyCover(uploadFile, courseForm, coverUploading)
+const onNewsCoverChange = (uploadFile) => applyCover(uploadFile, newsForm, newsCoverUploading)
+
+const submitNews = async () => {
+  if (!newsFormRef.value) return
+  const valid = await newsFormRef.value.validate()
+  if (!valid) return
+
+  newsPublishing.value = true
+  try {
+    const res = await createNews({ ...newsForm })
+    if (res.code === 200) {
+      ElMessage.success('资讯已提交，等待系统管理员审核')
+      newsFormRef.value.resetFields()
+      newsForm.coverUrl = ''
+      if (isAdmin.value) loadData()
+    } else {
+      ElMessage.error(res.message || '提交失败')
+    }
+  } catch (e) {
+    ElMessage.error('提交失败，请检查网络')
+  } finally {
+    newsPublishing.value = false
+  }
+}
+
 const submitCourse = async () => {
   if (!courseFormRef.value) return
   const valid = await courseFormRef.value.validate()
@@ -292,6 +438,10 @@ const doConfirmBooking = async (id) => {
 
 onMounted(async () => {
   if (!getToken()) return
+  // 资讯分类用于发布表单
+  getNewsCategories()
+    .then(r => { if (r.code === 200) newsCategoryOptions.value = r.data || [] })
+    .catch(() => {})
   try {
     const res = await getCurrentUser()
     currentUser.value = res.data
@@ -308,17 +458,68 @@ onMounted(async () => {
 <style scoped>
 .console-view {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--c-bg);
 }
 
 .page-section {
-  padding: 40px 0 80px;
+  padding: var(--sp-7) 0 var(--sp-8);
 }
 
 .section-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #303133;
-  margin-bottom: 30px;
+  font-size: var(--fs-24);
+  line-height: var(--lh-24);
+  font-weight: 500;
+  color: var(--c-text);
+  margin-bottom: var(--sp-6);
+}
+
+/* 课程封面上传 */
+.cover-field {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-5);
+  flex-wrap: wrap;
+}
+
+.cover-preview {
+  width: 200px;
+  height: 100px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  background: var(--c-surface-2);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-text-3);
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+}
+
+.cover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+}
+
+.cover-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.cover-tip {
+  margin: 0;
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: var(--c-text-3);
 }
 </style>

@@ -21,6 +21,21 @@ export const resetPassword = async (phone, newPassword) => {
   return request.put('/auth/reset-password', { phone, newPassword })
 }
 
+// 发送登录验证码（演示环境后端会在 data 中返回验证码）
+export const sendSmsCode = async (phone) => {
+  return request.post('/auth/sms-code', { phone })
+}
+
+// 验证码登录
+export const loginBySms = async (phone, code) => {
+  const res = await request.post('/auth/login-sms', { phone, code })
+  if (res.code === 200) {
+    setToken(res.data.token)
+    setUser(res.data.user)
+  }
+  return res
+}
+
 // 当前用户
 export const getCurrentUser = async () => {
   const res = await request.get('/auth/me')

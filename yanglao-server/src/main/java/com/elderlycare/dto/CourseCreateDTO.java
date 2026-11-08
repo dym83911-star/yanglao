@@ -10,6 +10,7 @@ public class CourseCreateDTO {
     private String description;
     private String type;
     private String tag;
+    private String coverUrl;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String location;

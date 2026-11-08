@@ -53,6 +53,11 @@ export const getHotNewsApi = (limit = 5) => {
   return request.get('/news/hot', { params: { limit } })
 }
 
+// 发布资讯（健康管理员 / 系统管理员），提交后为待审核状态
+export const createNews = (data) => {
+  return request.post('/news', data)
+}
+
 // 添加收藏
 export const addFavorite = (newsId) => {
   return request.post('/news/favorite', { newsId })

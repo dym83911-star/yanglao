@@ -4,6 +4,8 @@ import com.elderlycare.common.Result;
 import com.elderlycare.dto.AuthLoginDTO;
 import com.elderlycare.dto.AuthRegisterDTO;
 import com.elderlycare.dto.AuthResetPasswordDTO;
+import com.elderlycare.dto.AuthSmsCodeDTO;
+import com.elderlycare.dto.AuthSmsLoginDTO;
 import com.elderlycare.security.JwtUtil;
 import com.elderlycare.service.AuthService;
 import com.elderlycare.vo.LoginVO;
@@ -39,6 +41,18 @@ public class AuthController {
     @PutMapping("/reset-password")
     public Result<Void> resetPassword(@RequestBody AuthResetPasswordDTO dto) {
         return authService.resetPassword(dto);
+    }
+
+    /** 发送登录验证码（演示环境在响应中返回验证码） */
+    @PostMapping("/sms-code")
+    public Result<String> sendSmsCode(@RequestBody AuthSmsCodeDTO dto) {
+        return authService.sendSmsCode(dto.getPhone());
+    }
+
+    /** 验证码登录 */
+    @PostMapping("/login-sms")
+    public Result<LoginVO> loginBySms(@RequestBody AuthSmsLoginDTO dto) {
+        return authService.loginBySms(dto);
     }
 
     @PostMapping("/logout")

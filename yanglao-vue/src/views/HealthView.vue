@@ -44,9 +44,13 @@
 
     <div id="health" class="page-section active">
       <div class="container">
-        <h2 class="section-title">
-          <i class="bi bi-heart-pulse"></i> 健康守护
-        </h2>
+        <div class="page-hero">
+          <div>
+            <span class="page-eyebrow">DAILY WELLNESS</span>
+            <h2 class="page-title">健康守护</h2>
+            <p class="page-sub">记录每日血压、血糖与睡眠，形成长期趋势，让家人和医生都安心。</p>
+          </div>
+        </div>
 
         <el-tabs v-model="activeTab" type="border-card" @tab-change="handleTabChange">
           <el-tab-pane label="健康打卡" name="checkin">
@@ -385,7 +389,7 @@ watch(() => route.query.tab, (val) => {
 <style scoped>
 .health-view {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--c-bg);
 }
 
 .checkin-card {
@@ -403,25 +407,25 @@ watch(() => route.query.tab, (val) => {
 .tips-hero {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 22px 26px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  color: #fff;
-  box-shadow: 0 10px 24px rgba(91, 141, 190, 0.25);
-  margin-bottom: 22px;
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-5);
+  border-radius: var(--r-md);
+  background: var(--c-accent);
+  color: #fbfaf6;
+  box-shadow: var(--sh-1);
+  margin-bottom: var(--sp-5);
 }
 
 .tips-hero-icon {
-  width: 54px;
-  height: 54px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.22);
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.14);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.7rem;
+  font-size: 1.25rem;
 }
 
 .tips-hero-text h3 {
@@ -449,12 +453,12 @@ watch(() => route.query.tab, (val) => {
 }
 
 .tip-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px 22px 14px;
-  border-top: 4px solid var(--primary-color);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: var(--c-surface);
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5) var(--sp-3);
+  border-top: 3px solid var(--c-accent);
+  box-shadow: var(--sh-1);
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 
 .tip-card:hover {
@@ -470,31 +474,33 @@ watch(() => route.query.tab, (val) => {
 }
 
 .tip-icon {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
-  border-radius: 11px;
+  border-radius: var(--r-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
-  color: #fff;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  font-size: 1.1rem;
+  color: #fbfaf6;
+  background: var(--c-accent);
 }
 
 .tip-title {
   flex: 1;
-  font-size: 1.02rem;
-  font-weight: 600;
-  color: var(--primary-dark);
+  font-size: var(--fs-16);
+  line-height: var(--lh-16);
+  font-weight: 500;
+  color: var(--c-text);
 }
 
 .tip-count {
-  font-size: 0.75rem;
-  color: var(--primary-color);
-  background: rgba(91, 141, 190, 0.12);
-  padding: 2px 10px;
-  border-radius: 20px;
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: var(--c-text-2);
+  background: var(--c-surface-2);
+  padding: 2px var(--sp-3);
+  border-radius: var(--r-pill);
 }
 
 .tip-list {
@@ -506,12 +512,12 @@ watch(() => route.query.tab, (val) => {
 .tip-list li {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  padding: 7px 0;
-  color: #5a6672;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  border-bottom: 1px dashed #eef1f5;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0;
+  color: var(--c-text-2);
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  border-bottom: 1px dashed var(--c-border);
 }
 
 .tip-list li:last-child {
@@ -521,79 +527,40 @@ watch(() => route.query.tab, (val) => {
 .tip-list li i {
   flex-shrink: 0;
   margin-top: 2px;
-  font-size: 0.95rem;
-  color: var(--primary-light);
+  font-size: 0.9rem;
+  color: var(--c-accent);
 }
 
-/* 四张卡片各自的主题色 */
-.tip-card-0 {
-  border-top-color: #F5A962;
-}
-
-.tip-card-0 .tip-icon {
-  background: linear-gradient(135deg, #F5A962, #F0C078);
-}
-
-.tip-card-0 .tip-title,
+/* 四张卡片各自的主题色（统一取自 livery 调色台） */
+.tip-card-0 { border-top-color: var(--c-gold); }
+.tip-card-0 .tip-icon { background: var(--c-gold); }
 .tip-card-0 .tip-count {
-  color: #C97F33;
+  color: var(--c-gold);
+  background: color-mix(in srgb, var(--c-gold) 12%, var(--c-surface));
 }
+.tip-card-0 .tip-list li i { color: var(--c-gold); }
 
-.tip-card-0 .tip-count {
-  background: rgba(245, 169, 98, 0.15);
-}
-
-.tip-card-0 .tip-list li i {
-  color: #F5A962;
-}
-
-.tip-card-2 {
-  border-top-color: #4FB286;
-}
-
-.tip-card-2 .tip-icon {
-  background: linear-gradient(135deg, #4FB286, #7ED0AC);
-}
-
-.tip-card-2 .tip-title,
+.tip-card-2 { border-top-color: var(--c-success); }
+.tip-card-2 .tip-icon { background: var(--c-success); }
 .tip-card-2 .tip-count {
-  color: #2F7A5B;
+  color: var(--c-success);
+  background: color-mix(in srgb, var(--c-success) 14%, var(--c-surface));
 }
+.tip-card-2 .tip-list li i { color: var(--c-success); }
 
-.tip-card-2 .tip-count {
-  background: rgba(79, 178, 134, 0.15);
-}
-
-.tip-card-2 .tip-list li i {
-  color: #4FB286;
-}
-
-.tip-card-3 {
-  border-top-color: #8E86D8;
-}
-
-.tip-card-3 .tip-icon {
-  background: linear-gradient(135deg, #8E86D8, #B3AEE8);
-}
-
-.tip-card-3 .tip-title,
+.tip-card-3 { border-top-color: var(--c-text-3); }
+.tip-card-3 .tip-icon { background: var(--c-text-3); }
 .tip-card-3 .tip-count {
-  color: #5E56AE;
+  color: var(--c-text-2);
+  background: var(--c-surface-2);
 }
-
-.tip-card-3 .tip-count {
-  background: rgba(142, 134, 216, 0.15);
-}
-
-.tip-card-3 .tip-list li i {
-  color: #8E86D8;
-}
+.tip-card-3 .tip-list li i { color: var(--c-text-3); }
 
 :deep(.el-radio-button__inner) {
-  padding: 12px 20px;
+  padding: var(--sp-3) var(--sp-5);
 }
 
 :deep(.el-tabs__content) {
-  padding: 20px 0;
+  padding: var(--sp-5) 0;
 }
 </style>

@@ -34,9 +34,13 @@
 
     <div id="anti-fraud" class="page-section active">
       <div class="container">
-        <h2 class="section-title">
-          <i class="bi bi-shield-plus"></i> 数字反诈
-        </h2>
+        <div class="page-hero">
+          <div>
+            <span class="page-eyebrow">FRAUD PREVENTION</span>
+            <h2 class="page-title">数字反诈</h2>
+            <p class="page-sub">看懂常见骗局、自测风险、遇到可疑情况及时上报。</p>
+          </div>
+        </div>
 
         <el-tabs v-model="activeTab" type="border-card">
           <el-tab-pane label="诈骗案例" name="cases">
@@ -257,7 +261,7 @@ const testQuestions = [
 const testAnswers = reactive([])
 const testScore = ref(0)
 const resultText = ref('')
-const scoreColor = ref('#67C23A')
+const scoreColor = ref('#5c7a5a')
 
 const correctAnswers = ['b', 'b', 'b']
 
@@ -278,13 +282,13 @@ const submitTest = async () => {
 
   if (score === 3) {
     resultText.value = '🎉 满分！您的防骗能力很强！继续保持警惕！'
-    scoreColor.value = '#67C23A'
+    scoreColor.value = '#5c7a5a'
   } else if (score >= 2) {
     resultText.value = '👍 不错的成绩！您有一定的防骗意识，但还可以做得更好！'
-    scoreColor.value = '#E6A23C'
+    scoreColor.value = '#b28a48'
   } else {
     resultText.value = '⚠️ 需要提高警惕！建议您多学习防骗知识，谨防上当受骗！'
-    scoreColor.value = '#F56C6C'
+    scoreColor.value = '#a4625a'
   }
 
   // 尝试把答案提交到后端（失败不影响前端展示）
@@ -363,17 +367,17 @@ watch(() => route.query.tab, (val) => {
 <style scoped>
 .anti-fraud-view {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--c-bg);
 }
 
 .fraud-case-card {
-  margin-bottom: 20px;
+  margin-bottom: var(--sp-5);
 }
 
 .case-header {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--sp-4);
 }
 
 .case-header h4 {
@@ -382,39 +386,39 @@ watch(() => route.query.tab, (val) => {
 
 .case-content p {
   line-height: 1.8;
-  margin-bottom: 10px;
+  margin-bottom: var(--sp-3);
 }
 
 .tip-text {
-  color: #67c23a;
-  font-weight: bold;
+  color: var(--c-success);
+  font-weight: 500;
 }
 
 .test-question {
-  margin-bottom: 30px;
-  padding: 20px;
-  background: #f5f7fa;
-  border-radius: 8px;
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-5);
+  background: var(--c-surface-2);
+  border-radius: var(--r-sm);
 }
 
 .test-question h5 {
-  margin-bottom: 15px;
-  color: #333;
+  margin-bottom: var(--sp-4);
+  color: var(--c-text);
 }
 
 :deep(.el-radio) {
   display: block;
-  margin: 10px 0;
+  margin: var(--sp-2) 0;
 }
 
 .test-result {
   text-align: center;
-  padding: 20px;
+  padding: var(--sp-5);
 }
 
 .result-text {
-  margin-top: 20px;
-  font-size: 16px;
-  color: #333;
+  margin-top: var(--sp-5);
+  font-size: var(--fs-16);
+  color: var(--c-text);
 }
 </style>

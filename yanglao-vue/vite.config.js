@@ -15,6 +15,11 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8088',
         changeOrigin: true
+      },
+      // 后端本地上传目录映射出的静态图片
+      '/uploads': {
+        target: 'http://localhost:8088',
+        changeOrigin: true
       }
     }
   }

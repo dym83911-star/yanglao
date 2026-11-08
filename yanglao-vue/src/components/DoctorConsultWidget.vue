@@ -169,23 +169,24 @@ onMounted(() => {})
 <style scoped>
 .consult-fab {
   position: fixed;
-  right: 24px;
-  bottom: 32px;
+  right: var(--sp-5);
+  bottom: var(--sp-6);
   z-index: 9999;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 12px 18px;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  font-size: 15px;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  border: 1px solid var(--c-accent);
+  border-radius: var(--r-pill);
+  background: var(--c-accent);
+  color: #fbfaf6;
+  font-size: var(--fs-14);
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, .45);
-  transition: transform .15s ease;
+  box-shadow: var(--sh-2);
+  transition: background-color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 .consult-fab:hover {
+  background: var(--c-accent-hover);
   transform: translateY(-2px);
 }
 .consult-fab i {
@@ -194,54 +195,54 @@ onMounted(() => {})
 
 .login-hint {
   text-align: center;
-  padding: 60px 0;
-  color: #606266;
+  padding: var(--sp-8) 0;
+  color: var(--c-text-2);
 }
 .login-hint p {
-  margin: 16px 0;
+  margin: var(--sp-4) 0;
 }
 
 .qa-item {
-  border-bottom: 1px solid #ebeef5;
-  padding: 12px 0;
+  border-bottom: 1px solid var(--c-border);
+  padding: var(--sp-3) 0;
 }
 .qa-item .q, .qa-item .a {
   display: flex;
-  gap: 8px;
+  gap: var(--sp-2);
   align-items: flex-start;
   line-height: 1.6;
-  font-size: 14px;
+  font-size: var(--fs-14);
 }
 .qa-item .a {
-  margin-top: 8px;
-  color: #606266;
+  margin-top: var(--sp-2);
+  color: var(--c-text-2);
 }
 .qa-item .a.pending {
-  color: #e6a23c;
+  color: var(--c-warning);
 }
 .tag {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--fs-12);
   padding: 1px 6px;
-  border-radius: 4px;
-  color: #fff;
+  border-radius: var(--r-sm);
+  color: #fbfaf6;
 }
-.q-tag { background: #667eea; }
-.a-tag { background: #67c23a; }
+.q-tag { background: var(--c-accent); }
+.a-tag { background: var(--c-success); }
 .doctor {
-  margin-top: 4px;
-  font-size: 12px;
-  color: #909399;
+  margin-top: var(--sp-1);
+  font-size: var(--fs-12);
+  color: var(--c-text-3);
 }
 .asker {
-  font-size: 12px;
-  color: #909399;
-  margin-top: 4px;
+  font-size: var(--fs-12);
+  color: var(--c-text-3);
+  margin-top: var(--sp-1);
 }
 .empty-hint {
   text-align: center;
-  color: #909399;
-  padding: 40px 0;
-  font-size: 14px;
+  color: var(--c-text-3);
+  padding: var(--sp-7) 0;
+  font-size: var(--fs-14);
 }
 </style>

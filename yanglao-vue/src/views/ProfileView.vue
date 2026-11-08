@@ -76,7 +76,22 @@
             <el-card class="auth-card mt-3" v-if="!currentUser">
               <el-tabs v-model="authTab">
                 <el-tab-pane label="登录" name="login">
-                  <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
+                  <div class="login-mode">
+                    <button
+                      type="button"
+                      class="mode-btn"
+                      :class="{ active: loginMode === 'password' }"
+                      @click="loginMode = 'password'"
+                    >密码登录</button>
+                    <button
+                      type="button"
+                      class="mode-btn"
+                      :class="{ active: loginMode === 'sms' }"
+                      @click="loginMode = 'sms'"
+                    >验证码登录</button>
+                  </div>
+
+                  <el-form v-if="loginMode === 'password'" ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
                     <el-form-item prop="phone">
                       <el-input v-model="loginForm.phone" placeholder="手机号" prefix-icon="User" />
                     </el-form-item>
@@ -92,6 +107,28 @@
                       <el-link type="primary" @click="forgotVisible = true" style="float: right;">
                         <i class="bi bi-question-circle"></i> 忘记密码？
                       </el-link>
+                    </el-form-item>
+                  </el-form>
+
+                  <el-form v-else ref="smsFormRef" :model="smsForm" :rules="smsRules" size="large">
+                    <el-form-item prop="phone">
+                      <el-input v-model="smsForm.phone" placeholder="手机号" prefix-icon="Phone" />
+                    </el-form-item>
+                    <el-form-item prop="code">
+                      <div class="sms-row">
+                        <el-input v-model="smsForm.code" placeholder="6 位验证码" maxlength="6" prefix-icon="Message" />
+                        <el-button :disabled="smsCountdown > 0" @click="handleSendCode">
+                          {{ smsCountdown > 0 ? smsCountdown + 's 后重发' : '获取验证码' }}
+                        </el-button>
+                      </div>
+                    </el-form-item>
+                    <el-form-item>
+                      <el-button type="primary" @click="handleSmsLogin" style="width: 100%;">
+                        <i class="bi bi-shield-check"></i> 验证码登录
+                      </el-button>
+                    </el-form-item>
+                    <el-form-item style="margin-bottom: 0;">
+                      <span class="sms-hint">演示环境未接入短信网关，获取后验证码会直接提示在页面上</span>
                     </el-form-item>
                   </el-form>
                 </el-tab-pane>
@@ -200,7 +237,7 @@
                   </div>
                   <el-empty v-else description="暂无收藏内容">
                     <template #image>
-                      <i class="bi bi-star" style="font-size: 60px; color: #ddd;"></i>
+                      <i class="bi bi-star" style="font-size: 60px; color: var(--c-text-3);"></i>
                     </template>
                     <template #description>
                       <p>浏览课程和资讯时可以收藏感兴趣的内容</p>
@@ -278,9 +315,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { login, register, logout, updateUser, getCurrentUser, changePassword, resetPassword } from '../api/auth'
+import { login, loginBySms, sendSmsCode, register, logout, updateUser, getCurrentUser, changePassword, resetPassword } from '../api/auth'
 import { getFavorites, removeFavorite as removeFavoriteApi, clearFavorites as clearFavoritesApi, normalizeNewsItem } from '../api/news'
 import { getHealthStats, getCheckinDays } from '../api/health'
 import { getBookingCount } from '../api/booking'
@@ -297,6 +334,39 @@ const loginForm = reactive({
   phone: '',
   password: ''
 })
+
+// 登录方式：password 密码登录 / sms 验证码登录
+const loginMode = ref('password')
+const smsFormRef = ref(null)
+const smsForm = reactive({
+  phone: '',
+  code: ''
+})
+const smsCountdown = ref(0)
+let smsTimer = null
+
+const smsRules = {
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+  ],
+  code: [
+    { required: true, message: '请输入验证码', trigger: 'blur' },
+    { pattern: /^\d{6}$/, message: '验证码为 6 位数字', trigger: 'blur' }
+  ]
+}
+
+const startCountdown = () => {
+  smsCountdown.value = 60
+  clearInterval(smsTimer)
+  smsTimer = setInterval(() => {
+    smsCountdown.value -= 1
+    if (smsCountdown.value <= 0) {
+      clearInterval(smsTimer)
+      smsTimer = null
+    }
+  }, 1000)
+}
 
 // 角色判断：管理员/健康管理员显示管理控制台入口
 const isManager = computed(() => {
@@ -522,6 +592,55 @@ const handleLogin = async () => {
   }
 }
 
+const applyLoginResult = (user) => {
+  currentUser.value = user
+  settingsForm.name = user?.name || ''
+  settingsForm.avatar = user?.avatar || ''
+  loadCollectedNews()
+}
+
+const handleSendCode = async () => {
+  if (!smsFormRef.value) return
+  try {
+    await smsFormRef.value.validateField('phone')
+  } catch (e) {
+    return
+  }
+  try {
+    const res = await sendSmsCode(smsForm.phone)
+    if (res.code !== 200) {
+      ElMessage.error(res.message || res.msg || '验证码发送失败')
+      return
+    }
+    ElMessage.success(`验证码：${res.data}（演示环境，5 分钟内有效）`)
+    startCountdown()
+  } catch (error) {
+    ElMessage.error(error.response?.data?.message || '验证码发送失败')
+  }
+}
+
+const handleSmsLogin = async () => {
+  if (!smsFormRef.value) return
+  try {
+    const valid = await smsFormRef.value.validate()
+    if (!valid) return
+    const res = await loginBySms(smsForm.phone, smsForm.code)
+    if (res.code !== 200) {
+      ElMessage.error(res.message || res.msg || '登录失败')
+      return
+    }
+    applyLoginResult(res.data.user)
+    ElMessage.success('登录成功！')
+    smsFormRef.value.resetFields()
+  } catch (error) {
+    ElMessage.error(error.response?.data?.message || '登录失败，请重试')
+  }
+}
+
+onUnmounted(() => {
+  clearInterval(smsTimer)
+})
+
 const handleRegister = async () => {
   if (!registerFormRef.value) return
 
@@ -665,7 +784,7 @@ onMounted(() => {
 <style scoped>
 .profile-view {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--c-bg);
 }
 
 .profile-card {
@@ -698,9 +817,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
+  background: var(--c-surface-2);
   font-size: 40px;
-  color: var(--primary-color);
+  color: var(--c-accent);
 }
 
 .avatar-preview img {
@@ -716,18 +835,20 @@ onMounted(() => {
 }
 
 .profile-name {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: var(--fs-20);
+  line-height: var(--lh-20);
+  font-weight: 500;
+  color: var(--c-text);
 }
 
 .profile-phone {
-  color: #999;
+  color: var(--c-text-3);
 }
 
 .profile-stats {
   display: flex;
   justify-content: space-around;
-  padding: 20px 0;
+  padding: var(--sp-5) 0;
 }
 
 .stat-item {
@@ -736,33 +857,38 @@ onMounted(() => {
 
 .stat-item .stat-num {
   display: block;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--primary-color);
+  font-size: var(--fs-20);
+  line-height: var(--lh-20);
+  font-weight: 500;
+  color: var(--c-accent);
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-item .stat-label {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: var(--c-text-3);
 }
 
 .summary-item {
-  padding: 15px;
-  background: #f5f7fa;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  padding: var(--sp-4);
+  background: var(--c-surface-2);
+  border-radius: var(--r-sm);
+  margin-bottom: var(--sp-4);
 }
 
 .summary-label {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 5px;
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: var(--c-text-2);
+  margin-bottom: var(--sp-1);
 }
 
 .summary-value {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--primary-color);
+  font-size: var(--fs-16);
+  line-height: var(--lh-16);
+  font-weight: 500;
+  color: var(--c-text);
 }
 
 .auth-card :deep(.el-tabs__header) {

@@ -19,6 +19,9 @@ target/
 logs/
 *.log
 
+# ---------- 运行时上传文件（不纳入版本库） ----------
+yanglao-server/uploads/
+
 # ---------- IDE ----------
 .idea/
 .vscode/

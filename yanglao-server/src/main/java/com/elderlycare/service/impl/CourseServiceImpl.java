@@ -107,6 +107,7 @@ public class CourseServiceImpl implements CourseService {
         c.setDescription(dto.getDescription());
         c.setType(dto.getType());
         c.setTag(dto.getTag() == null || dto.getTag().isEmpty() ? "新上" : dto.getTag());
+        c.setCoverUrl(dto.getCoverUrl());
         c.setTeacherId(teacherId);
         c.setStartTime(dto.getStartTime());
         c.setEndTime(dto.getEndTime());

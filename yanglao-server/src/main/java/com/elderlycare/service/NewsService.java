@@ -27,6 +27,9 @@ public interface NewsService {
     /** 待审核资讯（系统管理员） */
     Result<List<News>> pending();
 
+    /** 发布资讯：提交后进入待审核状态 */
+    Result<Void> create(com.elderlycare.dto.NewsCreateDTO dto, Long authorId);
+
     /** 审核资讯（系统管理员） */
     Result<Void> review(Long id, boolean approved);
 }

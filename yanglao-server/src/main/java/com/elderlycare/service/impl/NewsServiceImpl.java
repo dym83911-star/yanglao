@@ -127,6 +127,34 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    public Result<Void> create(com.elderlycare.dto.NewsCreateDTO dto, Long authorId) {
+        if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
+            throw new BusinessException(400, "请填写资讯标题");
+        }
+        if (dto.getContent() == null || dto.getContent().trim().isEmpty()) {
+            throw new BusinessException(400, "请填写资讯正文");
+        }
+
+        String content = dto.getContent().trim();
+        News news = new News();
+        news.setTitle(dto.getTitle().trim());
+        news.setExcerpt(dto.getExcerpt() == null || dto.getExcerpt().trim().isEmpty()
+                ? (content.length() > 60 ? content.substring(0, 60) : content)
+                : dto.getExcerpt().trim());
+        news.setContent(content);
+        news.setCategory(dto.getCategory() == null || dto.getCategory().isEmpty() ? "健康养生" : dto.getCategory());
+        news.setCoverUrl(dto.getCoverUrl());
+        news.setSource(dto.getSource() == null || dto.getSource().trim().isEmpty() ? "智慧养老平台" : dto.getSource().trim());
+        news.setSourceUrl(dto.getSourceUrl());
+        news.setAuthorId(authorId);
+        news.setViewCount(0);
+        news.setIsHot(dto.getIsHot() == null ? 0 : dto.getIsHot());
+        news.setStatus(0);
+        newsMapper.insert(news);
+        return Result.success();
+    }
+
+    @Override
     public Result<Void> review(Long id, boolean approved) {
         News news = newsMapper.selectById(id);
         if (news == null) throw new BusinessException(404, "资讯不存在");

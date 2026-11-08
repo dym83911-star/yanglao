@@ -34,33 +34,46 @@
 
     <div id="classroom" class="page-section active">
       <div class="container">
-        <h2 class="section-title">
-          <i class="bi bi-mortarboard"></i> 银发课堂
-          <el-button size="small" type="primary" @click="router.push('/my-courses')" style="margin-left: auto;">
+        <div class="page-hero">
+          <div>
+            <span class="page-eyebrow">SILVER CLASSROOM</span>
+            <h2 class="page-title">银发课堂</h2>
+            <p class="page-sub">线上课程随时看，线下课程可预约，学习节奏由你掌握。</p>
+          </div>
+          <el-button round type="primary" @click="router.push('/my-courses')">
             <i class="bi bi-bookmark"></i> 我的课程
           </el-button>
-        </h2>
+        </div>
 
         <el-tabs v-model="activeTab" type="border-card">
           <el-tab-pane label="课程列表" name="list">
-            <div class="course-grid">
-              <el-card v-for="course in courses" :key="course.id" :body-style="{ padding: '0px' }" shadow="hover" v-loading="loading">
-                <div class="course-cover" :style="{ background: course.bgColor }">
-                  <i :class="course.icon"></i>
-                  <span class="course-tag">{{ course.tag }}</span>
+            <template v-for="group in courseGroups" :key="group.key">
+              <div class="course-group" v-if="group.list.length" v-loading="loading">
+                <header class="course-group-head">
+                  <h6>{{ group.label }}</h6>
+                  <span class="course-group-note">{{ group.note }} · {{ group.list.length }} 门</span>
+                </header>
+                <div class="course-grid">
+                  <el-card v-for="course in group.list" :key="course.id" :body-style="{ padding: '0px' }" shadow="hover">
+                    <div class="course-cover" :class="{ 'has-cover': course.cover }" :style="{ background: course.cover ? '#ffffff' : course.bgColor }">
+                      <img v-if="course.cover" :src="course.cover" :alt="course.name" class="course-cover-img" :style="{ objectFit: course.coverFit, objectPosition: course.coverPos }" />
+                      <i v-else :class="course.icon"></i>
+                      <span class="course-tag">{{ course.tag }}</span>
+                    </div>
+                    <div class="course-info">
+                      <h5>{{ course.name }}</h5>
+                      <p>{{ course.description }}</p>
+                      <div class="course-meta">
+                        <span><i class="bi bi-people"></i> {{ course.students }}人学习</span>
+                      </div>
+                      <el-button type="primary" @click="startLearning(course)" style="width: 100%;">
+                        <i class="bi bi-play-circle"></i> 开始学习
+                      </el-button>
+                    </div>
+                  </el-card>
                 </div>
-                <div class="course-info">
-                  <h5>{{ course.name }}</h5>
-                  <p>{{ course.description }}</p>
-                  <div class="course-meta">
-                    <span><i class="bi bi-people"></i> {{ course.students }}人学习</span>
-                  </div>
-                  <el-button type="primary" @click="startLearning(course)" style="width: 100%;">
-                    <i class="bi bi-play-circle"></i> 开始学习
-                  </el-button>
-                </div>
-              </el-card>
-            </div>
+              </div>
+            </template>
           </el-tab-pane>
 
           <el-tab-pane label="课程预约" name="book">
@@ -91,7 +104,7 @@
                       :label="`${c.name}（${c.location || '地点待定'}）`"
                       :value="c.id" />
                   </el-select>
-                  <div v-if="offlineCourses.length === 0" style="color: #909399; font-size: 13px; margin-top: 6px;">
+                  <div v-if="offlineCourses.length === 0" style="color: var(--c-text-3); font-size: 13px; margin-top: 6px;">
                     暂无可预约的线下课程
                   </div>
                 </el-form-item>
@@ -178,6 +191,12 @@ import { ElMessage } from 'element-plus'
 import { getCourses as fetchCourses, joinCourse } from '../api/course'
 import { createBooking, getBookings as fetchBookings, cancelBooking } from '../api/booking'
 import { getToken, getUser } from '../utils/session'
+import taiChiCover from '@/assets/course-taichi.png'
+import autumnCareCover from '@/assets/course-autumn-care.jpg'
+import safeTravelCover from '@/assets/course-safe-travel.jpg'
+import hypertensionCover from '@/assets/course-hypertension.jpg'
+import phoneBasicsCover from '@/assets/course-phone-basics.jpg'
+import mobilePayCover from '@/assets/course-mobile-pay.jpg'
 
 const route = useRoute()
 const router = useRouter()
@@ -192,29 +211,53 @@ const selectedCourse = ref(null)
 
 // 课程卡片样式（按顺序循环套用，兼容后端返回数据没有 icon/bgColor 的情况）
 const courseStyles = [
-  { icon: 'bi bi-phone', bgColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-  { icon: 'bi bi-credit-card-2-front', bgColor: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-  { icon: 'bi bi-person-arms-up', bgColor: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
-  { icon: 'bi bi-heart-pulse', bgColor: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
-  { icon: 'bi bi-people', bgColor: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }
+  { icon: 'bi bi-phone', bgColor: 'linear-gradient(135deg, #5c6b55 0%, #8a957e 100%)' },
+  { icon: 'bi bi-credit-card-2-front', bgColor: 'linear-gradient(135deg, #8d7a5c 0%, #b7a482 100%)' },
+  { icon: 'bi bi-person-arms-up', bgColor: 'linear-gradient(135deg, #4f6354 0%, #7d9180 100%)' },
+  { icon: 'bi bi-heart-pulse', bgColor: 'linear-gradient(135deg, #6d7a63 0%, #9aa78d 100%)' },
+  { icon: 'bi bi-people', bgColor: 'linear-gradient(135deg, #7a6a56 0%, #a89a82 100%)' }
 ]
 
 // 兜底课程数据：后端未启动时页面也能正常展示
 const fallbackCourses = [
-  { id: 1, name: '智能手机基础操作', description: '从零学习智能手机基本功能，包括打电话、发短信、微信视频。', tag: '热门', students: 128 },
-  { id: 2, name: '移动支付安全指南', description: '教您安全使用微信支付和支付宝，防止上当受骗。', tag: '推荐', students: 96 },
-  { id: 3, name: '太极拳入门', description: '线下太极拳培训，强身健体、修身养性。', tag: '新上', students: 45 },
-  { id: 4, name: '高血压防治知识', description: '由健康医生讲解高血压的饮食、运动和药物管理。', tag: '推荐', students: 210 },
-  { id: 5, name: '老年人安全出行指南', description: '教您安全乘坐公交地铁、用手机打车，以及出行防走失、防诈骗的实用技巧。', tag: '热门', students: 300 }
+  { id: 1, name: '智能手机基础操作', type: 'ONLINE', description: '从零学习智能手机基本功能，包括打电话、发短信、微信视频。', tag: '热门', students: 128 },
+  { id: 2, name: '移动支付安全指南', type: 'ONLINE', description: '教您安全使用微信支付和支付宝，防止上当受骗。', tag: '推荐', students: 96 },
+  { id: 3, name: '太极拳入门', type: 'OFFLINE', description: '线下太极拳培训，强身健体、修身养性。', tag: '新上', students: 45 },
+  { id: 4, name: '高血压防治知识', type: 'ONLINE', description: '由健康医生讲解高血压的饮食、运动和药物管理。', tag: '推荐', students: 210 },
+  { id: 5, name: '老年人安全出行指南', type: 'ONLINE', description: '教您安全乘坐公交地铁、用手机打车，以及出行防走失、防诈骗的实用技巧。', tag: '热门', students: 300 }
 ]
 
-// 补全卡片展示所需字段（icon/bgColor/students），兼容后端返回结构
+// 部分课程使用插画封面，其余沿用渐变色块
+const courseCovers = [
+  { match: '太极拳', cover: taiChiCover, fit: 'contain' },
+  { match: '秋季养生', cover: autumnCareCover },
+  { match: '安全出行', cover: safeTravelCover },
+  { match: '高血压', cover: hypertensionCover },
+  { match: '智能手机', cover: phoneBasicsCover, pos: 'center 32%' },
+  { match: '移动支付', cover: mobilePayCover, pos: 'center 72%' }
+]
+
+// 横图（太极拳）完整不裁切，竖构图用 cover 铺满，可按图微调取景位置
+const coverStyleOf = (name) => {
+  const hit = courseCovers.find(item => String(name || '').includes(item.match))
+  return {
+    cover: hit ? hit.cover : null,
+    fit: (hit && hit.fit) || 'cover',
+    pos: (hit && hit.pos) || 'center 55%'
+  }
+}
+
+// 补全卡片展示所需字段（icon/bgColor/cover/students），兼容后端返回结构
 const decorateCourses = (list) => (list || []).map((c, i) => {
   const style = courseStyles[i % courseStyles.length]
+  const cover = coverStyleOf(c.name)
   return {
     ...c,
     icon: c.icon || style.icon,
     bgColor: c.bgColor || style.bgColor,
+    cover: c.coverUrl || c.cover || cover.cover,
+    coverFit: c.coverFit || cover.fit,
+    coverPos: c.coverPos || cover.pos,
     students: c.students ?? c.currentStudents ?? 0
   }
 })
@@ -224,6 +267,22 @@ const courses = ref([])
 
 // 线下课程供预约下拉选择
 const offlineCourses = computed(() => courses.value.filter(c => c.type === 'OFFLINE'))
+
+// 课程列表按线上 / 线下分组展示
+const courseGroups = computed(() => [
+  {
+    key: 'online',
+    label: '线上课程',
+    note: '随时可学，支持手机端观看',
+    list: courses.value.filter(c => c.type !== 'OFFLINE')
+  },
+  {
+    key: 'offline',
+    label: '线下课程',
+    note: '在社区活动中心开课，可预约',
+    list: courses.value.filter(c => c.type === 'OFFLINE')
+  }
+])
 
 const bookings = ref([])
 
@@ -400,13 +459,44 @@ watch(() => route.query.tab, (val) => {
 <style scoped>
 .classroom-view {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--c-bg);
 }
 
 .course-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  gap: var(--sp-5);
+}
+
+/* 线上 / 线下分组 */
+.course-group + .course-group {
+  margin-top: var(--sp-6);
+}
+
+.course-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-2);
+  margin-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.course-group-head h6 {
+  margin: 0;
+  font-size: var(--fs-16);
+  line-height: var(--lh-16);
+  font-weight: 500;
+  letter-spacing: .06em;
+  color: var(--c-text);
+}
+
+.course-group-note {
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  letter-spacing: .06em;
+  color: var(--c-text-3);
 }
 
 .course-cover {
@@ -424,43 +514,84 @@ watch(() => route.query.tab, (val) => {
   z-index: 1;
 }
 
+.course-cover.has-cover {
+  border-bottom: 1px solid var(--c-border);
+}
+
+.course-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
 .course-tag {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 0.25rem 0.75rem;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
-  font-size: 0.8rem;
-  color: #333;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  padding: 2px var(--sp-3);
+  background: color-mix(in srgb, var(--c-surface) 88%, transparent);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: var(--c-text);
+  z-index: 2;
+}
+
+/* 插画封面是白底，给标签补一圈细边框，避免白底白标签看不见 */
+.course-cover.has-cover .course-tag {
+  border: 1px solid var(--c-border);
+}
+
+/* 卡片撑满整行高度，说明文字长短不同时按钮仍对齐在底部 */
+.course-grid > .el-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-grid > .el-card :deep(.el-card__body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .course-info {
-  padding: 15px;
+  padding: var(--sp-4);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.course-info .el-button {
+  margin-top: auto;
 }
 
 .course-info h5 {
-  margin-bottom: 10px;
+  margin-bottom: var(--sp-3);
 }
 
 .course-info p {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 10px;
+  color: var(--c-text-2);
+  font-size: var(--fs-14);
+  margin-bottom: var(--sp-3);
 }
 
 .course-meta {
-  margin-bottom: 15px;
-  color: #999;
-  font-size: 14px;
+  margin-bottom: var(--sp-4);
+  color: var(--c-text-3);
+  font-size: var(--fs-12);
 }
 
 .course-detail {
-  padding: 20px;
+  padding: var(--sp-5);
 }
 
 .course-detail p {
-  margin-bottom: 10px;
+  margin-bottom: var(--sp-3);
   line-height: 1.8;
 }
 </style>
